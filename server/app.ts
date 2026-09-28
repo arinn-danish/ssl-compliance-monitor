@@ -78,6 +78,17 @@ export const app = express();
 
 app.use(express.json({ limit: '10mb' }));
 
+// Middleware to normalize Netlify serverless function path rewrites
+app.use((req: Request, _res: Response, next) => {
+  if (req.url.startsWith('/.netlify/functions/api')) {
+    req.url = req.url.replace('/.netlify/functions/api', '/api');
+  }
+  if (!req.url.startsWith('/api')) {
+    req.url = '/api' + (req.url.startsWith('/') ? req.url : '/' + req.url);
+  }
+  next();
+});
+
 // ==========================================
 // REST API ENDPOINTS
 // ==========================================
