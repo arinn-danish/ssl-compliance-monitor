@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="sslSkyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="60%" stop-color="#0369a1" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="sslMountainGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="35%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+    <linearGradient id="sslGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="sslPageGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="50" cy="50" r="48" fill="url(#sslSkyGrad)" stroke="#38bdf8" stroke-width="2.5" />
+  <circle cx="50" cy="50" r="44" fill="none" stroke="url(#sslGoldGrad)" stroke-width="1" stroke-dasharray="2 1.5" opacity="0.6" />
+
+  <g stroke="#ffffff" stroke-width="0.8" opacity="0.25">
+    <line x1="50" y1="12" x2="50" y2="28" />
+    <line x1="32" y1="18" x2="38" y2="30" />
+    <line x1="68" y1="18" x2="62" y2="30" />
+    <line x1="20" y1="32" x2="32" y2="38" />
+    <line x1="80" y1="32" x2="68" y2="38" />
+  </g>
+
+  <path d="M18 64 L34 38 L42 46 L50 26 L62 48 L70 42 L82 64 Z" fill="url(#sslMountainGrad)" />
+  <path d="M50 26 L46 34 L54 34 Z M34 38 L31 43 L38 43 Z M70 42 L67 47 L74 47 Z" fill="#ffffff" opacity="0.85" />
+
+  <path d="M20 70 C32 66, 44 68, 49 75 L49 84 C43 78, 31 76, 20 79 Z" fill="url(#sslPageGrad)" stroke="#0284c7" stroke-width="0.8" />
+  <path d="M80 70 C68 66, 56 68, 51 75 L51 84 C57 78, 69 76, 80 79 Z" fill="url(#sslPageGrad)" stroke="#0284c7" stroke-width="0.8" />
+  <path d="M49 75 L50 85 L51 75 Z" fill="url(#sslGoldGrad)" />
+
+  <line x1="25" y1="72" x2="43" y2="70" stroke="#94a3b8" stroke-width="0.7" />
+  <line x1="25" y1="75" x2="43" y2="73" stroke="#94a3b8" stroke-width="0.7" />
+  <line x1="57" y1="70" x2="75" y2="72" stroke="#94a3b8" stroke-width="0.7" />
+  <line x1="57" y1="73" x2="75" y2="75" stroke="#94a3b8" stroke-width="0.7" />
+
+  <polygon points="50,86 52,90 56,90 53,92 54,96 50,93 46,96 47,92 44,90 48,90" fill="url(#sslGoldGrad)" />
+</svg>

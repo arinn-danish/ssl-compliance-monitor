@@ -1,0 +1,8 @@
+{
+  "name": "Remix Sabah State Library Compliance \u0026 Strategic Monitoring System",
+  "description": "Enterprise governance, audit evaluation, risk management, and strategic plan (2026–2028) compliance monitoring for the Sabah State Library.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

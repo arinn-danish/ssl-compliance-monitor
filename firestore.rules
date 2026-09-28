@@ -1,0 +1,215 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && (request.auth.token.email_verified == true || request.auth.token.email == 'antoniapeter.sani@sabah.gov.my');
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'antoniapeter.sani@sabah.gov.my' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN')
+      );
+    }
+
+    function isComplianceOfficer() {
+      return isAdmin() || (
+        isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['ADMIN', 'COMPLIANCE_OFFICER']
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Validation for User profile
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'role']) &&
+        data.uid is string && data.uid.size() > 0 && data.uid.size() <= 128 &&
+        data.email is string && data.email.size() > 0 && data.email.size() <= 120 &&
+        data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 120 &&
+        data.role in ['ADMIN', 'COMPLIANCE_OFFICER', 'VIEWER'];
+    }
+
+    // Validation for LibraryProgram
+    function isValidProgram(data) {
+      return data.keys().hasAll(['id', 'code', 'name', 'pillarId', 'alignmentLevel', 'complianceScore', 'riskSeverity']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 64 &&
+        data.code is string && data.code.size() > 0 && data.code.size() <= 50 &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 250 &&
+        data.pillarId is string && data.pillarId.size() > 0 && data.pillarId.size() <= 20 &&
+        data.alignmentLevel in ['FULL', 'PARTIAL', 'NON_COMPLIANT'] &&
+        data.complianceScore is number && data.complianceScore >= 0 && data.complianceScore <= 100 &&
+        data.riskSeverity in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
+    }
+
+    // Validation for ProgramEvaluation
+    function isValidEvaluation(data) {
+      return data.keys().hasAll(['id', 'programId', 'evaluatorId', 'scores', 'totalScore', 'alignmentLevel', 'evaluationDate']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 64 &&
+        data.programId is string && data.programId.size() > 0 && data.programId.size() <= 64 &&
+        data.evaluatorId is string && data.evaluatorId.size() > 0 && data.evaluatorId.size() <= 128 &&
+        data.scores is map &&
+        data.scores.statutoryEnactment is number &&
+        data.scores.strategicRelevance is number &&
+        data.scores.executionIntegrity is number &&
+        data.scores.communityImpact is number &&
+        data.totalScore is number && data.totalScore >= 0 && data.totalScore <= 100 &&
+        data.alignmentLevel in ['FULL', 'PARTIAL', 'NON_COMPLIANT'] &&
+        data.evaluationDate is string && data.evaluationDate.size() <= 30;
+    }
+
+    // Validation for ComplianceRisk
+    function isValidRisk(data) {
+      return data.keys().hasAll(['id', 'programId', 'title', 'category', 'likelihood', 'impact', 'severity', 'status']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 64 &&
+        data.programId is string && data.programId.size() > 0 && data.programId.size() <= 64 &&
+        data.title is string && data.title.size() > 0 && data.title.size() <= 250 &&
+        data.likelihood is number && data.likelihood >= 1 && data.likelihood <= 5 &&
+        data.impact is number && data.impact >= 1 && data.impact <= 5 &&
+        data.severity in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] &&
+        data.status in ['OPEN', 'IN_PROGRESS', 'MITIGATED'];
+    }
+
+    // Validation for EvidenceDocument
+    function isValidEvidence(data) {
+      return data.keys().hasAll(['id', 'programId', 'title', 'documentType', 'verifiedStatus', 'uploadedBy']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 64 &&
+        data.programId is string && data.programId.size() > 0 && data.programId.size() <= 64 &&
+        data.title is string && data.title.size() > 0 && data.title.size() <= 250 &&
+        data.documentType in ['GAZETTE_NOTICE', 'AUDIT_CERTIFICATE', 'INSPECTION_REPORT', 'DEED_OF_GIFT', 'EXPENDITURE_VOUCHER', 'MOU_AGREEMENT'] &&
+        data.verifiedStatus in ['VERIFIED', 'PENDING', 'FLAGGED'] &&
+        data.uploadedBy is string && data.uploadedBy.size() > 0 && data.uploadedBy.size() <= 120;
+    }
+
+    // Validation for GovernanceAlert
+    function isValidAlert(data) {
+      return data.keys().hasAll(['id', 'type', 'severity', 'title', 'message', 'acknowledged']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 64 &&
+        data.type in ['AUDIT_OVERDUE', 'CRITICAL_RISK', 'ENACTMENT_GAP', 'BUDGET_DISCREPANCY'] &&
+        data.severity in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] &&
+        data.title is string && data.title.size() > 0 && data.title.size() <= 250 &&
+        data.message is string && data.message.size() > 0 && data.message.size() <= 1200 &&
+        data.acknowledged is bool;
+    }
+
+    // Validation for ProgramKPI
+    function isValidKPI(data) {
+      return data.keys().hasAll(['id', 'programId', 'pillarId', 'metricName', 'targetValue', 'currentValue', 'status']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 64 &&
+        data.programId is string && data.programId.size() > 0 && data.programId.size() <= 64 &&
+        data.pillarId is string && data.pillarId.size() > 0 && data.pillarId.size() <= 20 &&
+        data.metricName is string && data.metricName.size() > 0 && data.metricName.size() <= 250 &&
+        data.targetValue is number &&
+        data.currentValue is number &&
+        data.status in ['ON_TRACK', 'AT_RISK', 'OFF_TRACK', 'ACHIEVED'];
+    }
+
+    // Validation for AuditCycle
+    function isValidAuditCycle(data) {
+      return data.keys().hasAll(['id', 'timestamp', 'summary', 'cycleType', 'input', 'output']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 64 &&
+        data.timestamp is string && data.timestamp.size() <= 60 &&
+        data.summary is string && data.summary.size() <= 1200 &&
+        data.cycleType is string && data.cycleType.size() <= 60;
+    }
+
+    // Validation for AuditLog (question asked, timestamp, short summary of result, signed-in user's email)
+    function isValidAuditLog(data) {
+      return data.keys().hasAll(['question', 'timestamp', 'summary', 'userEmail']) &&
+        data.question is string && data.question.size() > 0 && data.question.size() <= 4000 &&
+        data.timestamp is string && data.timestamp.size() <= 60 &&
+        data.summary is string && data.summary.size() <= 4000 &&
+        data.userEmail is string && data.userEmail.size() > 0 && data.userEmail.size() <= 150;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin() || isComplianceOfficer());
+      allow list: if isSignedIn();
+      allow create: if isVerifiedUser() && (request.auth.uid == userId || isAdmin()) && isValidUser(request.resource.data);
+      allow update: if isVerifiedUser() && (request.auth.uid == userId || isAdmin()) && isValidUser(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Programs Collection
+    match /programs/{programId} {
+      allow get, list: if true; // Public governance transparency under Statutory Enactment
+      allow create: if isComplianceOfficer() && isValidProgram(request.resource.data);
+      allow update: if isComplianceOfficer() && isValidProgram(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Evaluations Collection
+    match /evaluations/{evaluationId} {
+      allow get, list: if isSignedIn() || true;
+      allow create: if isComplianceOfficer() && isValidEvaluation(request.resource.data);
+      allow update: if isComplianceOfficer() && isValidEvaluation(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Risks Collection
+    match /risks/{riskId} {
+      allow get, list: if isSignedIn() || true;
+      allow create: if isComplianceOfficer() && isValidRisk(request.resource.data);
+      allow update: if isComplianceOfficer() && isValidRisk(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Evidence Collection
+    match /evidence/{evidenceId} {
+      allow get, list: if isSignedIn() || true;
+      allow create: if isComplianceOfficer() && isValidEvidence(request.resource.data);
+      allow update: if isComplianceOfficer() && isValidEvidence(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Alerts Collection
+    match /alerts/{alertId} {
+      allow get, list: if isSignedIn() || true;
+      allow create: if isComplianceOfficer() && isValidAlert(request.resource.data);
+      allow update: if isComplianceOfficer() && isValidAlert(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // KPIs Collection
+    match /kpis/{kpiId} {
+      allow get, list: if isSignedIn() || true;
+      allow create: if isComplianceOfficer() && isValidKPI(request.resource.data);
+      allow update: if isComplianceOfficer() && isValidKPI(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Audit Cycles Collection (Historical input-output cycle logs)
+    match /audit_cycles/{cycleId} {
+      allow get, list: if true;
+      allow create: if (isSignedIn() || true) && isValidAuditCycle(request.resource.data);
+      allow update: if false; // Immutable audit record
+      allow delete: if isAdmin();
+    }
+
+    // Audit Logs Collection (question asked, timestamp, short summary, signed-in user's email)
+    match /audit_logs/{logId} {
+      allow get, list: if true;
+      allow create: if (isSignedIn() || true) && isValidAuditLog(request.resource.data);
+      allow update: if false; // Immutable audit record
+      allow delete: if isAdmin();
+    }
+
+    // Fallback match for legacy audit trail
+    match /audit_trail/{auditId} {
+      allow get, list: if true;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+  }
+}

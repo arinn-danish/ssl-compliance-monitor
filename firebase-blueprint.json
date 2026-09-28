@@ -1,0 +1,515 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access for Sabah State Library governance",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Officer or auditor official Sabah government email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Full name and title"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["ADMIN", "COMPLIANCE_OFFICER", "VIEWER"],
+          "description": "Governance role level"
+        },
+        "designation": {
+          "type": "string",
+          "description": "Official post or appointment"
+        },
+        "branch": {
+          "type": "string",
+          "description": "Assigned library branch or department"
+        },
+        "avatarInitials": {
+          "type": "string",
+          "maxLength": 4,
+          "description": "Initials badge"
+        }
+      },
+      "required": ["uid", "email", "displayName", "role"]
+    },
+    "LibraryProgram": {
+      "title": "LibraryProgram",
+      "description": "Sabah State Library program monitored under Enactment 1988 & Strategic Plan 2026-2028",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique program identifier"
+        },
+        "code": {
+          "type": "string",
+          "maxLength": 30,
+          "description": "Program tracking code e.g. SSL-PRG-001"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Official program title"
+        },
+        "pillarId": {
+          "type": "string",
+          "description": "Associated strategic pillar ID (1-5)"
+        },
+        "pillarName": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Strategic pillar title"
+        },
+        "branch": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Library branch managing execution"
+        },
+        "leadOfficer": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Appointed program lead officer"
+        },
+        "statutoryReference": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "Enactment 1988 statutory mandate clause"
+        },
+        "strategicObjective": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Strategic Plan 2026-2028 target outcome"
+        },
+        "alignmentLevel": {
+          "type": "string",
+          "enum": ["FULL", "PARTIAL", "NON_COMPLIANT"],
+          "description": "Statutory alignment tier"
+        },
+        "complianceScore": {
+          "type": "number",
+          "description": "Audit score out of 100"
+        },
+        "riskSeverity": {
+          "type": "string",
+          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+          "description": "Current overall risk tier"
+        },
+        "budgetMYR": {
+          "type": "number",
+          "description": "Allocated budget in Ringgit Malaysia"
+        },
+        "budgetSpentMYR": {
+          "type": "number",
+          "description": "Utilized budget in Ringgit Malaysia"
+        },
+        "kpiProgress": {
+          "type": "number",
+          "description": "Percentage progress against annual KPI targets"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["ACTIVE", "UNDER_REVIEW", "SUSPENDED", "COMPLETED"],
+          "description": "Execution status"
+        },
+        "lastAuditedAt": {
+          "type": "string",
+          "description": "ISO date of last compliance audit"
+        },
+        "nextAuditDue": {
+          "type": "string",
+          "description": "ISO date of subsequent scheduled review"
+        },
+        "evidenceCount": {
+          "type": "number",
+          "description": "Verified documents submitted"
+        },
+        "unresolvedRisksCount": {
+          "type": "number",
+          "description": "Active open risks"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Scope and public engagement description"
+        }
+      },
+      "required": ["id", "code", "name", "pillarId", "alignmentLevel", "complianceScore", "riskSeverity"]
+    },
+    "ProgramEvaluation": {
+      "title": "ProgramEvaluation",
+      "description": "Statutory audit evaluation score sheet for a library program",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique evaluation record ID"
+        },
+        "programId": {
+          "type": "string",
+          "description": "Target library program ID"
+        },
+        "programName": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Program name"
+        },
+        "evaluatorId": {
+          "type": "string",
+          "description": "UID of evaluator/auditor"
+        },
+        "evaluatorName": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Name of auditor"
+        },
+        "evaluatorRole": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Audit role e.g. Internal Audit"
+        },
+        "evaluationDate": {
+          "type": "string",
+          "description": "ISO audit date"
+        },
+        "scores": {
+          "type": "object",
+          "description": "Statutory rubric 4-dimension scoring",
+          "properties": {
+            "statutoryEnactment": { "type": "number" },
+            "strategicRelevance": { "type": "number" },
+            "executionIntegrity": { "type": "number" },
+            "communityImpact": { "type": "number" }
+          },
+          "required": ["statutoryEnactment", "strategicRelevance", "executionIntegrity", "communityImpact"]
+        },
+        "totalScore": {
+          "type": "number",
+          "description": "Aggregated score out of 100"
+        },
+        "alignmentLevel": {
+          "type": "string",
+          "enum": ["FULL", "PARTIAL", "NON_COMPLIANT"]
+        },
+        "statutoryEnactmentClause": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "gapsIdentified": {
+          "type": "array",
+          "description": "Specific statutory or operational deficiencies noted"
+        },
+        "auditorNotes": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Official auditor comments and recommendations"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["DRAFT", "SUBMITTED", "APPROVED", "ESCALATED"]
+        },
+        "correctiveAction": {
+          "type": "object",
+          "description": "Mandatory corrective action plan if deficiencies found",
+          "properties": {
+            "id": { "type": "string" },
+            "actionRequired": { "type": "string", "maxLength": 500 },
+            "assignedOfficer": { "type": "string", "maxLength": 100 },
+            "dueDate": { "type": "string" },
+            "status": { "type": "string", "enum": ["PENDING", "IN_PROGRESS", "RESOLVED", "OVERDUE"] },
+            "escalationLevel": { "type": "string", "enum": ["INTERNAL", "DIRECTOR_ESCALATION", "MINISTRY_NOTICE"] }
+          }
+        }
+      },
+      "required": ["id", "programId", "evaluatorId", "scores", "totalScore", "alignmentLevel", "evaluationDate"]
+    },
+    "ComplianceRisk": {
+      "title": "ComplianceRisk",
+      "description": "Risk register entry for potential statutory non-compliance or operational failure",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Risk entry ID"
+        },
+        "programId": {
+          "type": "string",
+          "description": "Associated program ID"
+        },
+        "programName": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "pillarId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "STATUTORY_NON_COMPLIANCE",
+            "PRESERVATION_INTEGRITY",
+            "FINANCIAL_DISCLOSURE",
+            "RURAL_EQUAL_ACCESS_GAP",
+            "INFORMATION_SECURITY"
+          ]
+        },
+        "likelihood": {
+          "type": "number",
+          "description": "1 to 5"
+        },
+        "impact": {
+          "type": "number",
+          "description": "1 to 5"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+        },
+        "mitigationStrategy": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "owner": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "status": {
+          "type": "string",
+          "enum": ["OPEN", "IN_PROGRESS", "MITIGATED"]
+        },
+        "identifiedDate": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "programId", "title", "category", "likelihood", "impact", "severity", "status"]
+    },
+    "EvidenceDocument": {
+      "title": "EvidenceDocument",
+      "description": "Official verified audit evidence or legal gazette document",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        },
+        "programName": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "documentType": {
+          "type": "string",
+          "enum": ["GAZETTE_NOTICE", "AUDIT_CERTIFICATE", "INSPECTION_REPORT", "DEED_OF_GIFT", "EXPENDITURE_VOUCHER", "MOU_AGREEMENT"]
+        },
+        "fileName": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "fileSize": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "uploadedBy": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "uploadedAt": {
+          "type": "string"
+        },
+        "verifiedStatus": {
+          "type": "string",
+          "enum": ["VERIFIED", "PENDING", "FLAGGED"]
+        },
+        "provenanceDetails": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "fileUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "tags": {
+          "type": "array"
+        }
+      },
+      "required": ["id", "programId", "title", "documentType", "verifiedStatus", "uploadedBy"]
+    },
+    "GovernanceAlert": {
+      "title": "GovernanceAlert",
+      "description": "Real-time compliance warning or statutory breach alert",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["AUDIT_OVERDUE", "CRITICAL_RISK", "ENACTMENT_GAP", "BUDGET_DISCREPANCY"]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "programId": {
+          "type": "string"
+        },
+        "programName": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "acknowledged": {
+          "type": "boolean"
+        },
+        "actionUrl": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      "required": ["id", "type", "severity", "title", "message", "acknowledged"]
+    },
+    "ProgramKPI": {
+      "title": "ProgramKPI",
+      "description": "Strategic milestone and KPI target tracking",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        },
+        "pillarId": {
+          "type": "string"
+        },
+        "metricName": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "baselineValue": {
+          "type": "number"
+        },
+        "targetValue": {
+          "type": "number"
+        },
+        "currentValue": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "targetYear": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "status": {
+          "type": "string",
+          "enum": ["ON_TRACK", "AT_RISK", "OFF_TRACK", "ACHIEVED"]
+        },
+        "measurementFrequency": {
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": ["id", "programId", "pillarId", "metricName", "targetValue", "currentValue", "status"]
+    },
+    "AuditCycle": {
+      "title": "AuditCycle",
+      "description": "Historical log of an input-output cycle executed against Sabah State Library governance modules",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "cycleType": { "type": "string" },
+        "summary": { "type": "string" },
+        "officerName": { "type": "string" },
+        "officerRole": { "type": "string" },
+        "status": { "type": "string", "enum": ["SUCCESS", "WARNING", "FAILED"] },
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      "required": ["id", "timestamp", "summary", "cycleType", "input", "output"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Statutory inquiry audit log recording question asked, timestamp, short summary of result, and signed-in user email",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "question": { "type": "string", "description": "Question asked" },
+        "timestamp": { "type": "string", "description": "Timestamp of audit inquiry" },
+        "summary": { "type": "string", "description": "Short summary of the result" },
+        "userEmail": { "type": "string", "description": "Signed-in user's email" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "rawAnswer": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["question", "timestamp", "summary", "userEmail"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles with role permissions"
+    },
+    "/programs/{programId}": {
+      "schema": { "$ref": "#/entities/LibraryProgram" },
+      "description": "Library programs and governance status"
+    },
+    "/evaluations/{evaluationId}": {
+      "schema": { "$ref": "#/entities/ProgramEvaluation" },
+      "description": "Audit evaluation score sheets"
+    },
+    "/kpis/{kpiId}": {
+      "schema": { "$ref": "#/entities/ProgramKPI" },
+      "description": "Strategic KPI indicators"
+    },
+    "/risks/{riskId}": {
+      "schema": { "$ref": "#/entities/ComplianceRisk" },
+      "description": "Statutory risk register entries"
+    },
+    "/evidence/{evidenceId}": {
+      "schema": { "$ref": "#/entities/EvidenceDocument" },
+      "description": "Verified evidentiary compliance documentation"
+    },
+    "/alerts/{alertId}": {
+      "schema": { "$ref": "#/entities/GovernanceAlert" },
+      "description": "Governance alerts and audit notifications"
+    },
+    "/audit_cycles/{cycleId}": {
+      "schema": { "$ref": "#/entities/AuditCycle" },
+      "description": "Immutable chronological input-output cycle logs"
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Statutory audit inquiry logs storing question, timestamp, result summary, and signed-in user email"
+    }
+  }
+}
